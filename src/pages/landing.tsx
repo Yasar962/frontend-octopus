@@ -2,16 +2,8 @@ import "../components/landing.css";
 
 const Landing = () => {
   const handleGitHubLogin = () => {
-    const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID;
-    const redirectUri = "http://localhost:8000/api/auth/github/callback";
-
-    const githubAuthUrl =
-      `https://github.com/login/oauth/authorize` +
-      `?client_id=${clientId}` +
-      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
-      `&scope=read:user repo`;
-
-    window.location.href = githubAuthUrl;
+    // Let the backend handle the GitHub OAuth flow
+    window.location.href = "http://localhost:8000/auth/github";
   };
 
   return (

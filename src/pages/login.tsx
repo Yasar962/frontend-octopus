@@ -6,16 +6,12 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get("token");
-    const user = params.get("user");
-
-    if (token && user) {
-      sessionStorage.setItem("github_token", token);
-      sessionStorage.setItem("github_user", user);
+    // Check if user is already logged in
+    const token = sessionStorage.getItem("github_token");
+    if (token) {
       navigate("/dashboard");
     }
-  }, []);
+  }, [navigate]);
 
   return (
     <div>
