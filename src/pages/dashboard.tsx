@@ -1,17 +1,54 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { verifyToken } from "../auth.ts";
+import { verifyToken } from "../auth";
 import "../components/dashboard.css";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const user = verifyToken();
 
+  // ✅ Hooks MUST be inside component
+  const [repoUrl, setRepoUrl] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<any>(null);
+  const [error, setError] = useState("");
+
   useEffect(() => {
     if (!user) {
       navigate("/");
     }
   }, [user, navigate]);
+
+  // ✅ Function MUST be inside component
+  const analyzeRepo = async () => {
+    if (!repoUrl) {
+      setError("Please enter a GitHub repository URL");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError("");
+
+      const response = await fetch(
+        `http://localhost:8000/analyze?repo_url=${encodeURIComponent(repoUrl)}`,
+        {
+          method: "POST",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to analyze repository");
+      }
+
+      const data = await response.json();
+      setResult(data);
+    } catch (err: any) {
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!user) return <p>Redirecting...</p>;
 
@@ -21,41 +58,53 @@ const Dashboard = () => {
       <div className="top-bar">
         <div className="logo">OCTOPUS</div>
         <div className="avatar">
-          <img src={(user as any)?.avatar || "/placeholder-avatar.png"} alt={(user as any)?.username || "User"} />
+          <img
+            src={(user as any)?.avatar || "/placeholder-avatar.png"}
+            alt={(user as any)?.username || "User"}
+          />
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="dashboard-content">
-        {/* Left Panel - Repositories */}
+        {/* Left Panel */}
         <div className="glass-card repo-panel">
           <h3>Your Repositories</h3>
-          <ul>
-            <li>Repository 1</li>
-            <li>Repository 2</li>
-            <li>Repository 3</li>
-          </ul>
         </div>
 
-        {/* Center Panel - Issues */}
+        {/* Center Panel */}
         <div className="glass-card">
           <h3>Issues</h3>
-          <div className="issue active">
-            <h4>Welcome {(user as any)?.username || "User"}</h4>
-            <p>GitHub ID: {(user as any)?.github_id || "N/A"}</p>
-          </div>
+          <p>Welcome {(user as any)?.username}</p>
         </div>
 
-        {/* Right Panel - Solver */}
+        {/* Right Panel */}
         <div className="glass-card solver-panel">
-          <h3>AI Solver</h3>
-          <p>Select an issue to get AI-powered suggestions</p>
-          <input 
-            type="text" 
-            className="solver-input" 
-            placeholder="Ask something about this issue..." 
+          <h3>Repository Analyzer</h3>
+
+          <input
+            type="text"
+            className="solver-input"
+            placeholder="Paste GitHub repo URL..."
+            value={repoUrl}
+            onChange={(e) => setRepoUrl(e.target.value)}
           />
-          <button className="solve-btn">Get Solution</button>
+
+          <button
+            className="solve-btn"
+            onClick={analyzeRepo}
+            disabled={loading}
+          >
+            {loading ? "Analyzing..." : "Analyze Repository"}
+          </button>
+
+          {error && <p style={{ color: "red" }}>{error}</p>}
+
+          {result && (
+            <div className="analysis-result">
+              <p><strong>Repo:</strong> {result.repo?.name}</p>
+              <p><strong>Issues:</strong> {result.issues_ingested}</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
