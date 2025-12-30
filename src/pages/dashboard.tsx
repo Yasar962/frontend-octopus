@@ -24,6 +24,7 @@ const Dashboard = () => {
   // Issues state
   const [issues, setIssues] = useState<Issue[]>([]);
   const [difficultyFilter, setDifficultyFilter] = useState<string | null>(null);
+  const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -31,19 +32,28 @@ const Dashboard = () => {
     }
   }, [user, navigate]);
 
+  // 🔹 Fetch issues from backend on component mount
+  useEffect(() => {
+    fetchIssues();
+  }, []);
+
   // 🔹 Fetch issues from backend
   const fetchIssues = async (filter: string | null = null) => {
-    if (!result?.repo) return;
+    try {
+      let url = `http://localhost:8000/issues?repo_id=1`;
 
-    const repoId = 1; // TEMP: replace with real repo_id later
+      if (filter) {
+        url += `&difficulty=${filter}`;
+      }
 
-    const url = filter
-      ? `http://localhost:8000/issues?repo_id=${repoId}&difficulty=${filter}`
-      : `http://localhost:8000/issues?repo_id=${repoId}`;
+      const res = await fetch(url);
+      const data = await res.json();
 
-    const res = await fetch(url);
-    const data = await res.json();
-    setIssues(data);
+      setIssues(data);
+    } catch (err) {
+      console.error("Error fetching issues:", err);
+      setError("Failed to fetch issues");
+    }
   };
 
   // 🔹 Analyze repo (ingest issues)
@@ -78,6 +88,13 @@ const Dashboard = () => {
     }
   };
 
+  // 🔹 Handle issue click
+  const handleIssueClick = (issue: Issue) => {
+    setSelectedIssue(issue);
+    // You can also navigate to a detailed view or open a modal
+    console.log("Selected issue:", issue);
+  };
+
   if (!user) return <p>Redirecting...</p>;
 
   return (
@@ -100,7 +117,7 @@ const Dashboard = () => {
         </div>
 
         {/* Center Panel */}
-        <div className="glass-card">
+        <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           <h3>Issues</h3>
           <p>Welcome {(user as any)?.username}</p>
 
@@ -120,6 +137,7 @@ const Dashboard = () => {
             ))}
 
             <button
+              className={difficultyFilter === null ? "active" : ""}
               onClick={() => {
                 setDifficultyFilter(null);
                 fetchIssues(null);
@@ -130,11 +148,16 @@ const Dashboard = () => {
           </div>
 
           {/* 🔹 Issues List */}
-          <div className="issues-list">
+          <div className="issues-list" style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
             {issues.length === 0 && <p>No issues found.</p>}
 
             {issues.map((issue) => (
-              <div key={issue.id} className="issue-card">
+              <div
+                key={issue.id}
+                className="issue-card"
+                onClick={() => handleIssueClick(issue)}
+                style={{ cursor: "pointer" }}
+              >
                 <h4>
                   #{issue.number} — {issue.title}
                 </h4>
@@ -143,7 +166,7 @@ const Dashboard = () => {
                   {issue.difficulty}
                 </span>
 
-                <p>{issue.body.slice(0, 200)}...</p>
+                
               </div>
             ))}
           </div>
@@ -179,6 +202,20 @@ const Dashboard = () => {
               <p>
                 <strong>Issues ingested:</strong> {result.issues_ingested}
               </p>
+            </div>
+          )}
+
+          {/* 🔹 Selected Issue Detail */}
+          {selectedIssue && (
+            <div className="selected-issue">
+              <h4>Selected Issue</h4>
+              <p>
+                <strong>#{selectedIssue.number}</strong> {selectedIssue.title}
+              </p>
+              <span className={`badge ${selectedIssue.difficulty.toLowerCase()}`}>
+                {selectedIssue.difficulty}
+              </span>
+              <p>{selectedIssue.body}</p>
             </div>
           )}
         </div>

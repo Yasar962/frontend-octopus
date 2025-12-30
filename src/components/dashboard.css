@@ -12,8 +12,9 @@
   background-image: url("https://images.unsplash.com/photo-1616616839679-eec174e9d429");
   background-size: cover;
   background-position: center;
-  font-family: IBM Plex Mono;
+  font-family: IBM Plex Mono, monospace;
   position: relative;
+  overflow: hidden;
 }
 
 /* Top bar */
@@ -27,12 +28,16 @@
   background: rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  position: relative;
+  z-index: 10;
 }
 
 .logo {
   color: white;
   font-size: 1.4rem;
   font-weight: 600;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
 /* Avatar */
@@ -42,6 +47,14 @@
   border-radius: 50%;
   border: 2px solid rgba(255, 255, 255, 0.4);
   cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.avatar img:hover {
+  transform: scale(1.1);
+  border-color: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.2);
 }
 
 /* Main layout */
@@ -65,12 +78,30 @@
   box-shadow:
     0 20px 40px rgba(0, 0, 0, 0.35),
     inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  box-shadow:
+    0 25px 50px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
 }
 
 .glass-card h3 {
   margin-bottom: 15px;
   font-size: 1.1rem;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.95;
+}
+
+.glass-card p {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin-bottom: 15px;
 }
 
 /* Repo Panel */
@@ -79,70 +110,218 @@
 }
 
 .repo-panel li {
-  padding: 10px;
+  padding: 12px 14px;
   border-radius: 10px;
   cursor: pointer;
   margin-bottom: 8px;
   background: rgba(255, 255, 255, 0.08);
-  transition: background 0.2s;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
 }
 
 .repo-panel li:hover {
   background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateX(5px);
 }
 
-/* Issues */
-.issue {
-  padding: 12px;
+/* Filter Bar */
+.filter-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-bar button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: IBM Plex Mono, monospace;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.filter-bar button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.filter-bar button.active {
+  background: rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+/* Issues List */
+.issues-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-right: 8px;
+  padding-top: 4px;
+}
+
+.issues-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.issues-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.issues-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+
+.issues-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Issue Card */
+.issue-card {
+  padding: 18px 18px 20px;
   border-radius: 12px;
-  margin-bottom: 12px;
   background: rgba(255, 255, 255, 0.08);
   cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* 🔑 FIX */
+  min-height: 120px;
 }
 
-.issue.active {
+
+.issue-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.2));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.issue-card:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.35);
+  transform: translateX(8px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.issue-card:hover::before {
+  opacity: 1;
+}
+
+.issue-card.active {
   background: rgba(0, 0, 0, 0.35);
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.issue h4 {
+.issue-card h4 {
   font-size: 0.95rem;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
+  font-weight: 600;
+  opacity: 0.95;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.issue p {
-  font-size: 0.8rem;
-  opacity: 0.85;
+.issue-card p {
+  font-size: 0.82rem;
+  opacity: 0.75;
+  line-height: 1.6;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Badge */
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  align-self: flex-start;
+}
+
+.badge.beginner {
+  background: rgba(34, 197, 94, 0.25);
+  color: rgb(134, 239, 172);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+.badge.moderate {
+  background: rgba(251, 191, 36, 0.25);
+  color: rgb(253, 224, 71);
+  border: 1px solid rgba(251, 191, 36, 0.4);
+}
+
+.badge.professional {
+  background: rgba(239, 68, 68, 0.25);
+  color: rgb(252, 165, 165);
+  border: 1px solid rgba(239, 68, 68, 0.4);
 }
 
 /* Solver Panel */
+.solver-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 8px;
+}
+
+.solver-panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.solver-panel::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.solver-panel::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+
+.solver-panel::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
 .solver-panel p {
   font-size: 0.9rem;
   opacity: 0.85;
-  margin-bottom: 20px;
 }
 
-.solve-btn {
-  width: 100%;
-  padding: 12px;
-  border-radius: 12px;
-  border: none;
-  background: rgba(17, 17, 17, 0.9);
-  color: white;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-
-.solve-btn:hover {
-  background: #000;
-  transform: translateY(-2px);
-}
 /* Solver input */
 .solver-input {
   width: 100%;
   padding: 12px 14px;
-  margin-bottom: 14px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.25);
 
@@ -152,6 +331,8 @@
 
   backdrop-filter: blur(12px);
   outline: none;
+  transition: all 0.3s ease;
+  font-family: IBM Plex Mono, monospace;
 }
 
 .solver-input::placeholder {
@@ -161,11 +342,112 @@
 .solver-input:focus {
   border-color: rgba(255, 255, 255, 0.5);
   background: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
 }
 
-/* Solver hint text */
-.solver-hint {
+/* Solve Button */
+.solve-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  background: rgba(17, 17, 17, 0.9);
+  color: white;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: IBM Plex Mono, monospace;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.solve-btn:hover:not(:disabled) {
+  background: #000;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+.solve-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.solve-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Analysis Result */
+.analysis-result {
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin-top: 12px;
+}
+
+.analysis-result p {
   font-size: 0.85rem;
-  opacity: 0.8;
-  margin-bottom: 14px;
+  margin-bottom: 8px;
+  opacity: 0.9;
+}
+
+.analysis-result p:last-child {
+  margin-bottom: 0;
+}
+
+.analysis-result strong {
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 600;
+}
+
+/* Selected Issue */
+.selected-issue {
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin-top: 12px;
+}
+
+.selected-issue h4 {
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+  opacity: 0.95;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.selected-issue p {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin-top: 8px;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .dashboard-content {
+    grid-template-columns: 1fr 2fr;
+  }
+  
+  .solver-panel {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-content {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 15px;
+  }
+  
+  .top-bar {
+    padding: 0 20px;
+  }
+  
+  .logo {
+    font-size: 1.2rem;
+  }
 }
