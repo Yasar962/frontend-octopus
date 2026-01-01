@@ -11,6 +11,7 @@
   width: 100vw;
   background-image: url("https://images.unsplash.com/photo-1616616839679-eec174e9d429");
   background-size: cover;
+  
   background-position: center;
   font-family: IBM Plex Mono, monospace;
   position: relative;
@@ -69,7 +70,7 @@
 /* Glass card base */
 .glass-card {
   background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(18px) saturate(180%);
+  backdrop-filter: blur(18px) saturate(180%) brightness(50%);
   border-radius: 16px;
   padding: 20px;
   color: white;
