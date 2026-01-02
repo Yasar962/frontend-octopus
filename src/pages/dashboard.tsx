@@ -151,6 +151,13 @@ const Dashboard = () => {
       });
 
       alert("Feedback submitted. AI will refine this step.");
+      const res = await authFetch(
+      `http://localhost:8000/solutions/${selectedIssue.id}`
+    );
+    const data = await res.json();
+
+    setSolutionSteps(Array.isArray(data.steps) ? data.steps : []);
+      
     } catch {
       alert("Failed to submit feedback");
     }
