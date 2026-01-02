@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { verifyToken } from "../auth";
+import { authFetch } from "../api";
 import "../components/dashboard.css";
 
 type Repo = {
@@ -11,10 +12,19 @@ type Repo = {
 
 type Issue = {
   id: number;
-  number: number;
+  issue_number: number;
   title: string;
   body: string;
-  difficulty: "Beginner" | "Moderate" | "Professional";
+  difficulty: "Beginner" | "Moderate" | "Professional" | "Pending";
+};
+
+type SolutionStep = {
+  step: number;
+  title: string;
+  explanation: string;
+  file: string;
+  action: string;
+  verification: string;
 };
 
 const Dashboard = () => {
@@ -29,108 +39,128 @@ const Dashboard = () => {
   const [difficultyFilter, setDifficultyFilter] = useState<string | null>(null);
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
 
-  const [solution, setSolution] = useState("");
+  const [solutionSteps, setSolutionSteps] = useState<SolutionStep[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // 🔒 Redirect if not authenticated
   useEffect(() => {
     if (!user) navigate("/");
   }, [user, navigate]);
 
+  // 🔁 Load repos on mount
   useEffect(() => {
     fetchRepositories();
   }, []);
 
   const fetchRepositories = async () => {
-    const res = await fetch("http://localhost:8000/repositories");
-    setRepositories(await res.json());
+    try {
+      const res = await authFetch("http://localhost:8000/repositories");
+      const data = await res.json();
+      setRepositories(data);
+    } catch (err) {
+      console.error("Failed to fetch repositories", err);
+    }
   };
 
   const fetchIssues = async (repoId: number, filter: string | null = null) => {
-    let url = `http://localhost:8000/issues?repo_id=${repoId}`;
-    if (filter) url += `&difficulty=${filter}`;
-    const res = await fetch(url);
-    setIssues(await res.json());
-  };
+    try {
+      let url = `http://localhost:8000/issues?repo_id=${repoId}`;
+      if (filter) url += `&difficulty=${filter}`;
 
-  // 🔁 Poll while analyzing
-  useEffect(() => {
-    if (!selectedRepo) return;
-
-    fetchIssues(selectedRepo.id, difficultyFilter);
-
-    if (selectedRepo.status === "analyzing" || selectedRepo.status === "queued") {
-      const interval = setInterval(() => {
-        fetchRepositories();
-        fetchIssues(selectedRepo.id, difficultyFilter);
-      }, 4000);
-
-      return () => clearInterval(interval);
+      const res = await authFetch(url);
+      const data = await res.json();
+      setIssues(Array.isArray(data) ? data : []);
+    } catch {
+      setIssues([]);
     }
-  }, [selectedRepo, difficultyFilter]);
+  };
 
   const analyzeRepo = async () => {
     if (!repoUrl) return;
     setLoading(true);
 
-    await fetch(
-      `http://localhost:8000/analyze?repo_url=${encodeURIComponent(repoUrl)}`,
-      { method: "POST" }
-    );
-
-    setRepoUrl("");
-    setLoading(false);
-    fetchRepositories();
+    try {
+      await authFetch(
+        `http://localhost:8000/analyze?repo_url=${encodeURIComponent(repoUrl)}`,
+        { method: "POST" }
+      );
+      setRepoUrl("");
+      fetchRepositories();
+    } finally {
+      setLoading(false);
+    }
   };
 
   const deleteRepository = async (repoId: number) => {
-    const confirmed = window.confirm("Delete repository permanently?");
-    if (!confirmed) return;
+    if (!window.confirm("Delete repository permanently?")) return;
 
-    await fetch(`http://localhost:8000/repositories/${repoId}`, {
-      method: "DELETE",
-    });
+    try {
+      await authFetch(
+        `http://localhost:8000/repositories/${repoId}`,
+        { method: "DELETE" }
+      );
 
-    if (selectedRepo?.id === repoId) {
-      setSelectedRepo(null);
-      setIssues([]);
-      setSelectedIssue(null);
-      setSolution("");
+      if (selectedRepo?.id === repoId) {
+        setSelectedRepo(null);
+        setIssues([]);
+        setSelectedIssue(null);
+        setSolutionSteps([]);
+      }
+
+      fetchRepositories();
+    } catch {
+      alert("Failed to delete repository");
     }
-
-    fetchRepositories();
   };
 
   const handleRepoClick = (repo: Repo) => {
     setSelectedRepo(repo);
     setSelectedIssue(null);
-    setSolution("");
+    setSolutionSteps([]);
+    fetchIssues(repo.id, difficultyFilter);
   };
 
   const handleIssueClick = async (issue: Issue) => {
     setSelectedIssue(issue);
-    setSolution("Thinking...");
+    setSolutionSteps([]);
 
-    const res = await fetch(`http://localhost:8000/solutions/${issue.id}`);
-    const data = await res.json();
+    try {
+      const res = await authFetch(
+        `http://localhost:8000/solutions/${issue.id}`
+      );
+      const data = await res.json();
+      setSolutionSteps(Array.isArray(data.steps) ? data.steps : []);
+    } catch {
+      setSolutionSteps([]);
+    }
+  };
 
-    const formatted = data.steps
-      .map(
-        (s: any) =>
-          `Step ${s.step}: ${s.title}\n` +
-          `• Explanation: ${s.explanation}\n` +
-          `• File: ${s.file}\n` +
-          `• Action: ${s.action}\n` +
-          `• Verify: ${s.verification}\n`
-      )
-      .join("\n");
+  const submitFeedback = async (stepNumber: number) => {
+    const error = prompt("Paste the error output or explain what failed:");
+    if (!error || !selectedIssue) return;
 
-    setSolution(formatted);
+    try {
+      await authFetch("http://localhost:8000/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          issue_id: selectedIssue.id,
+          step_number: stepNumber,
+          error
+        })
+      });
+
+      alert("Feedback submitted. AI will refine this step.");
+    } catch {
+      alert("Failed to submit feedback");
+    }
   };
 
   if (!user) return null;
 
   return (
     <div className="dashboard-container">
+      {/* TOP BAR */}
       <div className="top-bar">
         <div className="logo">OCTOPUS</div>
         <div className="avatar">
@@ -139,6 +169,7 @@ const Dashboard = () => {
       </div>
 
       <div className="dashboard-content">
+        {/* LEFT PANEL */}
         <div className="glass-card repo-panel">
           <h3>Repository Analyzer</h3>
 
@@ -150,7 +181,7 @@ const Dashboard = () => {
           />
 
           <button className="solve-btn" onClick={analyzeRepo} disabled={loading}>
-            {loading ? "Queued..." : "Analyze Repository"}
+            {loading ? "Analyzing..." : "Analyze Repository"}
           </button>
 
           <h3 style={{ marginTop: 20 }}>Your Repositories</h3>
@@ -161,6 +192,7 @@ const Dashboard = () => {
                 {repo.name}
                 {repo.status !== "ready" && ` (${repo.status})`}
               </button>
+
               <button
                 className="delete-repo-btn"
                 onClick={() => deleteRepository(repo.id)}
@@ -171,6 +203,7 @@ const Dashboard = () => {
           ))}
         </div>
 
+        {/* MIDDLE PANEL */}
         <div className="glass-card middle-panel">
           <div className="middle-panel-content">
             {!selectedRepo && <p>Select a repository</p>}
@@ -179,23 +212,25 @@ const Dashboard = () => {
               <>
                 <h3>Issues</h3>
 
-                {selectedRepo.status !== "ready" && (
-                  <p>🔄 Issues are loading progressively...</p>
-                )}
-
                 <div className="filter-bar">
                   {["Beginner", "Moderate", "Professional"].map((d) => (
                     <button
                       key={d}
                       className={difficultyFilter === d ? "active" : ""}
-                      onClick={() => setDifficultyFilter(d)}
+                      onClick={() => {
+                        setDifficultyFilter(d);
+                        fetchIssues(selectedRepo.id, d);
+                      }}
                     >
                       {d}
                     </button>
                   ))}
                   <button
                     className={!difficultyFilter ? "active" : ""}
-                    onClick={() => setDifficultyFilter(null)}
+                    onClick={() => {
+                      setDifficultyFilter(null);
+                      fetchIssues(selectedRepo.id);
+                    }}
                   >
                     All
                   </button>
@@ -209,7 +244,7 @@ const Dashboard = () => {
                       onClick={() => handleIssueClick(issue)}
                     >
                       <h4>
-                        #{issue.number} — {issue.title}
+                        #{issue.issue_number} — {issue.title}
                       </h4>
                       <span
                         className={`badge ${issue.difficulty.toLowerCase()}`}
@@ -224,9 +259,16 @@ const Dashboard = () => {
 
             {selectedIssue && (
               <>
-                <button className="back-btn" onClick={() => setSelectedIssue(null)}>
+                <button
+                  className="back-btn"
+                  onClick={() => {
+                    setSelectedIssue(null);
+                    setSolutionSteps([]);
+                  }}
+                >
                   ← Back
                 </button>
+
                 <h3>{selectedIssue.title}</h3>
                 <p>{selectedIssue.body}</p>
               </>
@@ -234,13 +276,33 @@ const Dashboard = () => {
           </div>
         </div>
 
+        {/* RIGHT PANEL */}
         <div className="glass-card solver-panel">
           <h3>AI Solution</h3>
-          {!selectedIssue ? (
-            <p>Select an issue</p>
-          ) : (
-            <pre style={{ whiteSpace: "pre-wrap" }}>{solution}</pre>
+
+          {!selectedIssue && <p>Select an issue to get AI solution</p>}
+
+          {selectedIssue && solutionSteps.length === 0 && (
+            <p>Thinking…</p>
           )}
+
+          {solutionSteps.map((step) => (
+            <div key={step.step} className="solution-step">
+              <h4>Step {step.step}: {step.title}</h4>
+
+              <p><strong>Explanation:</strong> {step.explanation}</p>
+              <p><strong>File:</strong> {step.file}</p>
+              <p><strong>Action:</strong> {step.action}</p>
+              <p><strong>Verify:</strong> {step.verification}</p>
+
+              <button
+                className="feedback-btn"
+                onClick={() => submitFeedback(step.step)}
+              >
+                ❌ This step failed
+              </button>
+            </div>
+          ))}
         </div>
       </div>
     </div>
