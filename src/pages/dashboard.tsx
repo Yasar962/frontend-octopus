@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { verifyToken } from "../auth";
 import { authFetch } from "../api";
@@ -42,10 +42,25 @@ const Dashboard = () => {
   const [solutionSteps, setSolutionSteps] = useState<SolutionStep[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // 🔹 Avatar menu
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
   // 🔒 Redirect if not authenticated
   useEffect(() => {
     if (!user) navigate("/");
   }, [user, navigate]);
+
+  // 🔁 Close avatar menu on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   // 🔁 Load repos on mount
   useEffect(() => {
@@ -150,17 +165,25 @@ const Dashboard = () => {
         })
       });
 
-      alert("Feedback submitted. AI will refine this step.");
       const res = await authFetch(
-      `http://localhost:8000/solutions/${selectedIssue.id}`
-    );
-    const data = await res.json();
-
-    setSolutionSteps(Array.isArray(data.steps) ? data.steps : []);
-      
+        `http://localhost:8000/solutions/${selectedIssue.id}`
+      );
+      const data = await res.json();
+      setSolutionSteps(Array.isArray(data.steps) ? data.steps : []);
     } catch {
       alert("Failed to submit feedback");
     }
+  };
+
+  // 🔹 Avatar actions
+  const logout = () => {
+    sessionStorage.clear();
+    navigate("/");
+  };
+
+  const switchAccount = () => {
+    sessionStorage.clear();
+    window.location.href = "http://localhost:8000/auth/github";
   };
 
   if (!user) return null;
@@ -170,8 +193,37 @@ const Dashboard = () => {
       {/* TOP BAR */}
       <div className="top-bar">
         <div className="logo">OCTOPUS</div>
-        <div className="avatar">
-          <img src={(user as any)?.avatar} />
+
+        <div className="avatar-wrapper" ref={menuRef}>
+          <img
+            src={(user as any)?.avatar}
+            className="avatar-img"
+            onClick={() => setMenuOpen(!menuOpen)}
+          />
+
+          {menuOpen && (
+            <div className="avatar-menu">
+              <div className="avatar-menu-header">
+                <img src={(user as any)?.avatar} />
+                <div>
+                  <strong>{(user as any)?.login || "GitHub User"}</strong>
+                  <small>Connected</small>
+                </div>
+              </div>
+
+              <button onClick={() => alert("Profile page coming soon")}>
+                Profile
+              </button>
+
+              <button onClick={switchAccount}>
+                Switch Account
+              </button>
+
+              <button className="danger" onClick={logout}>
+                Sign Out
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

@@ -582,3 +582,75 @@
   background: rgba(239, 68, 68, 0.35);
   transform: scale(1.05);
 }
+
+/* Avatar Menu */
+.avatar-wrapper {
+  position: relative;
+}
+
+.avatar-img {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+}
+
+.avatar-menu {
+  position: absolute;
+  top: 55px;
+  right: 0;
+  width: 220px;
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(14px);
+  border-radius: 14px;
+  padding: 8px;
+  border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+  animation: fadeIn 0.15s ease-out;
+  z-index: 50;
+}
+
+.avatar-menu-header {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.avatar-menu-header img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.avatar-menu button {
+  width: 100%;
+  background: none;
+  border: none;
+  color: white;
+  padding: 10px;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 10px;
+  font-size: 0.85rem;
+}
+
+.avatar-menu button:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.avatar-menu .danger {
+  color: rgb(252, 165, 165);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
