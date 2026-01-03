@@ -654,3 +654,72 @@
     transform: scale(1);
   }
 }
+
+/* Repo Status */
+.repo-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.repo-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.repo-status {
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.repo-status.queued {
+  background: rgba(59, 130, 246, 0.25);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.4);
+}
+
+.repo-status.analyzing {
+  background: rgba(234, 179, 8, 0.25);
+  color: #fde047;
+  border: 1px solid rgba(234, 179, 8, 0.4);
+  animation: pulse 1.5s infinite;
+}
+
+.repo-status.ready {
+  background: rgba(34, 197, 94, 0.25);
+  color: #86efac;
+  border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+/* Solver Text Wrapping Fix */
+.solution-step {
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+}
+
+.solution-step p {
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+/* Code Block */
+.code-block {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 0.8rem;
+  font-family: "IBM Plex Mono", monospace;
+  overflow-x: auto;
+  white-space: pre;
+  margin-top: 6px;
+}

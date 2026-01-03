@@ -63,9 +63,28 @@ const Dashboard = () => {
   }, []);
 
   // 🔁 Load repos on mount
+  // 🔁 Load repos on mount
   useEffect(() => {
     fetchRepositories();
   }, []);
+
+  // 🔄 Auto-refresh repo status while analyzing
+  useEffect(() => {
+    if (repositories.length === 0) return;
+
+    const hasAnalyzing = repositories.some(
+      (r) => r.status === "queued" || r.status === "analyzing"
+    );
+
+    if (!hasAnalyzing) return;
+
+    const interval = setInterval(() => {
+      fetchRepositories();
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [repositories]);
+
 
   const fetchRepositories = async () => {
     try {
@@ -247,10 +266,17 @@ const Dashboard = () => {
 
           {repositories.map((repo) => (
             <div key={repo.id} className="repo-item">
-              <button className="repo-btn" onClick={() => handleRepoClick(repo)}>
-                {repo.name}
-                {repo.status !== "ready" && ` (${repo.status})`}
+              <button
+                className={`repo-btn ${repo.status}`}
+                onClick={() => repo.status === "ready" && handleRepoClick(repo)}
+                disabled={repo.status !== "ready"}
+              >
+                <span>{repo.name}</span>
+                <span className={`repo-status ${repo.status}`}>
+                  {repo.status}
+                </span>
               </button>
+
 
               <button
                 className="delete-repo-btn"
@@ -351,7 +377,9 @@ const Dashboard = () => {
 
               <p><strong>Explanation:</strong> {step.explanation}</p>
               <p><strong>File:</strong> {step.file}</p>
-              <p><strong>Action:</strong> {step.action}</p>
+              <p><strong>Action:</strong></p>
+              <pre className="code-block">{step.action}</pre>
+
               <p><strong>Verify:</strong> {step.verification}</p>
 
               <button
