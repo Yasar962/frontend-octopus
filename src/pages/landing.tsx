@@ -1,9 +1,11 @@
 import "../components/landing.css";
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
 
 const Landing = () => {
   const handleGitHubLogin = () => {
     // Let the backend handle the GitHub OAuth flow
-    window.location.href = "http://localhost:8000/auth/github";
+    window.location.href = `${API_BASE}/auth/github`;
   };
 
   return (

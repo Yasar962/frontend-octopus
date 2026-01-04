@@ -29,3 +29,4 @@ dist-ssr
 # 2) or use scripts/remove-project.ps1 on Windows
 # Example:
 # /my-project/
+.vercel
