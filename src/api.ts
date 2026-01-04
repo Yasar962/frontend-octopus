@@ -1,5 +1,11 @@
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
+if (!API_BASE) {
+  throw new Error("VITE_API_BASE_URL is not defined");
+}
+
 export const authFetch = async (
-  url: string,
+  path: string,
   options: RequestInit = {}
 ) => {
   const token = sessionStorage.getItem("github_token");
@@ -8,15 +14,19 @@ export const authFetch = async (
     throw new Error("No auth token found");
   }
 
-  const headers = {
+  const headers: HeadersInit = {
     ...(options.headers || {}),
     Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
   };
 
-  const res = await fetch(url, {
+  if (options.body) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  const res = await fetch(`${API_BASE}${path}`, {
     ...options,
     headers,
+    credentials: "include",
   });
 
   if (res.status === 401) {

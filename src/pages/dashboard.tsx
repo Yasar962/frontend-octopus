@@ -74,9 +74,6 @@ const stripImagesFromMarkdown = (text: string): string => {
 };
 
 
-
-
-
 const Dashboard = () => {
   const navigate = useNavigate();
   const user = verifyToken();
@@ -203,44 +200,27 @@ const Dashboard = () => {
 
   // 🔌 WebSocket connection (NO polling fallback)
   const connectWS = (repoId: number) => {
-    if (wsRef.current) {
-      wsRef.current.close();
-      wsRef.current = null;
-    }
+    if (wsRef.current) wsRef.current.close();
 
-    try {
-      const ws = new WebSocket(`wss://${API_BASE.replace("https://", "")}/ws/progress/${repoId}`);
-      wsRef.current = ws;
+    const wsBase = import.meta.env.VITE_API_BASE_URL.replace(/^http/, "ws");
+    wsRef.current = new WebSocket(`${wsBase}/ws/progress/${repoId}`);
 
-      ws.onmessage = (e) => {
-        const data = JSON.parse(e.data);
-
-        setRepositories((prev) =>
-          prev.map((r) =>
-            r.id === repoId
-              ? {
-                  ...r,
-                  issues_ingested:
-                    data.issues_ingested ?? r.issues_ingested,
-                  issues_classified:
-                    data.issues_classified ?? r.issues_classified,
-                  
-                }
-              : r
-          )
-        );
-
-        // 🔥 reflect ingested issues immediately
-        fetchIssues(repoId, difficultyFilter);
-      };
-
-      ws.onerror = () => {
-        console.warn("WebSocket error");
-      };
-    } catch {
-      console.warn("WebSocket connection failed");
-    }
+    wsRef.current.onmessage = (e) => {
+      const data = JSON.parse(e.data);
+      setRepositories((prev) =>
+        prev.map((r) =>
+          r.id === repoId
+            ? {
+                ...r,
+                issues_ingested: data.issues_ingested ?? r.issues_ingested,
+                issues_classified: data.issues_classified ?? r.issues_classified,
+              }
+            : r
+        )
+      );
+    };
   };
+
 
   const handleRepoClick = (repo: Repo) => {
     setSelectedRepo(repo);
