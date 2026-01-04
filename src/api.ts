@@ -14,13 +14,11 @@ export const authFetch = async (
     throw new Error("No auth token found");
   }
 
-  // ✅ FORCE plain object
   const headers: Record<string, string> = {
     ...(options.headers as Record<string, string> | undefined),
     Authorization: `Bearer ${token}`,
   };
 
-  // ✅ Safe now
   if (options.body) {
     headers["Content-Type"] = "application/json";
   }
@@ -28,10 +26,11 @@ export const authFetch = async (
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,
     headers,
-    credentials: "include",
   });
 
   if (res.status === 401) {
+    sessionStorage.clear();
+    window.location.href = "/";
     throw new Error("Unauthorized");
   }
 

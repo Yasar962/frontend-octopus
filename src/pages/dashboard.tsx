@@ -104,7 +104,7 @@ const Dashboard = () => {
 
   const fetchGitHubRepos = async () => {
     try {
-      const res = await authFetch(`${API_BASE}/github/repos`);
+      const res = await authFetch("/github/repos");
       const data = await res.json();
       setGithubRepos(data);
     } catch {
@@ -139,7 +139,7 @@ const Dashboard = () => {
 
   const fetchRepositories = async () => {
     try {
-      const res = await authFetch(`${API_BASE}/repositories`);
+      const res = await authFetch("/repositories");
       const data = await res.json();
       setRepositories(data);
     } catch (err) {
@@ -149,7 +149,7 @@ const Dashboard = () => {
 
   const fetchIssues = async (repoId: number, filter: string | null = null) => {
     try {
-      let url = `${API_BASE}/issues?repo_id=${repoId}`;
+      let url = `/issues?repo_id=${repoId}`;
       if (filter) url += `&difficulty=${filter}`;
 
       const res = await authFetch(url);
@@ -166,7 +166,7 @@ const Dashboard = () => {
 
     try {
       await authFetch(
-        `${API_BASE}/analyze?repo_url=${encodeURIComponent(repoUrl)}`,
+        `/analyze?repo_url=${encodeURIComponent(repoUrl)}`,
         { method: "POST" }
       );
       setRepoUrl("");
@@ -181,7 +181,7 @@ const Dashboard = () => {
 
     try {
       await authFetch(
-        `${API_BASE}/repositories/${repoId}`,
+        `/repositories/${repoId}`,
         { method: "DELETE" }
       );
 
@@ -236,7 +236,7 @@ const Dashboard = () => {
 
     try {
       const res = await authFetch(
-        `${API_BASE}/solutions/${issue.id}`
+        `/solutions/${issue.id}`
       );
       const data = await res.json();
       setSolutionSteps(Array.isArray(data.steps) ? data.steps : []);
@@ -250,7 +250,7 @@ const Dashboard = () => {
     if (!error || !selectedIssue) return;
 
     try {
-      await authFetch(`${API_BASE}/feedback`, {
+      await authFetch("/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -261,7 +261,7 @@ const Dashboard = () => {
       });
 
       const res = await authFetch(
-        `${API_BASE}/solutions/${selectedIssue.id}`
+        `/solutions/${selectedIssue.id}`
       );
       const data = await res.json();
       setSolutionSteps(Array.isArray(data.steps) ? data.steps : []);
