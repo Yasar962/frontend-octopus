@@ -1,77 +1,148 @@
+import { useState } from "react";
 import "../components/landing.css";
+import InteractiveBackground from "../components/InteractiveBackground";
+import octorLogo from "../assets/Octor logo.svg";
+
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
-
 const Landing = () => {
+  const [showAbout, setShowAbout] = useState(false);
+
   const handleGitHubLogin = () => {
-    // Let the backend handle the GitHub OAuth flow
     window.location.href = `${API_BASE}/auth/github`;
   };
 
   return (
     <div className="landing-container">
-      {/* Animated background */}
-      <div className="gradient-bg"></div>
-      <div className="grid-overlay"></div>
-      
-      {/* Floating particles */}
-      <div className="particle"></div>
-      <div className="particle"></div>
-      <div className="particle"></div>
-      <div className="particle"></div>
+      {/* Background */}
+      <InteractiveBackground />
 
-      {/* GitHub logo watermark */}
-      <svg className="github-logo" viewBox="0 0 16 16" fill="currentColor">
-        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
-      </svg>
+      {/* Watermark logo */}
+      <div className="company-logo-bg">
+        <img src={octorLogo} alt="Octor Logo" />
+      </div>
 
-      {/* Main content card */}
-      <div className="content-card">
-        <div className="logo-section">
-          <div className="logo-icon">
-            <svg viewBox="0 0 16 16">
-              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
-            </svg>
-          </div>
-          <h1 className="title">OCTOPUS</h1>
+      {/* Main card */}
+      <div
+        className="content-card tilt-card"
+        onMouseMove={(e) => {
+          const card = e.currentTarget;
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+
+          const rotateX = -(y - rect.height / 2) / 20;
+          const rotateY = (x - rect.width / 2) / 20;
+
+          card.style.transform = `
+            perspective(1200px)
+            rotateX(${rotateX}deg)
+            rotateY(${rotateY}deg)
+            translateZ(10px)
+          `;
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform =
+            "perspective(1200px) rotateX(0) rotateY(0)";
+        }}
+      >
+        {/* Logo */}
+        <div className="logo-center tilt-logo">
+          <img src={octorLogo} alt="Octor AI" />
         </div>
 
         <p className="subtitle">
           Analyze repositories. Solve issues. Build smarter.
         </p>
 
-        <div className="features">
-          <div className="feature-item">
-            <svg className="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/>
-            </svg>
-            <span>Intelligent issue analysis and categorization</span>
+        {/* How it works */}
+        <div className="how-it-works">
+          <div className="step">
+            <span className="step-index">01</span>
+            <div>
+              <h4>Connect GitHub</h4>
+              <p>
+                Securely authenticate with GitHub using OAuth.
+                No passwords, no manual setup.
+              </p>
+            </div>
           </div>
-          <div className="feature-item">
-            <svg className="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/>
-            </svg>
-            <span>Automated solution recommendations</span>
+
+          <div className="step">
+            <span className="step-index">02</span>
+            <div>
+              <h4>Octor Analyzes</h4>
+              <p>
+                Octor understands your repositories, issues,
+                and code context using AI.
+              </p>
+            </div>
           </div>
-          <div className="feature-item">
-            <svg className="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/>
-            </svg>
-            <span>Seamless GitHub integration</span>
+
+          <div className="step">
+            <span className="step-index">03</span>
+            <div>
+              <h4>Actionable Insights</h4>
+              <p>
+                Get intelligent issue summaries, fix
+                recommendations, and clarity.
+              </p>
+            </div>
           </div>
         </div>
 
-        <button className="github-btn" onClick={handleGitHubLogin}>
-          <svg className="github-icon" viewBox="0 0 16 16">
-            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
-          </svg>
-          Continue with GitHub
-        </button>
+        {/* Value strip */}
+        <div className="value-strip">
+          <span>Built for developers</span>
+          <span>AI-driven insights</span>
+          <span>Secure OAuth</span>
+        </div>
 
-        <p className="footer-text">
-          Secure OAuth authentication • No password required
-        </p>
+        {/* Actions */}
+        <div className="action-group">
+          <button className="github-btn" onClick={handleGitHubLogin}>
+            Continue with GitHub
+          </button>
+
+          <button
+            className="what-is-btn what-is-center"
+            onClick={() => setShowAbout(true)}
+          >
+            What is Octor?
+          </button>
+        </div>
       </div>
+
+      {/* Popover card (OUTSIDE the card – correct) */}
+      {showAbout && (
+        <>
+          <div
+            className="about-popover-overlay"
+            onClick={() => setShowAbout(false)}
+          />
+
+          <div className="about-popover">
+            <h3>What is Octor?</h3>
+
+            <p>
+              Octor is an AI-powered engineering assistant that understands
+              GitHub repositories beyond syntax — it understands intent.
+            </p>
+
+            <p>
+              It analyzes issues, pull requests, and code structure to
+              generate contextual insights and intelligent fix
+              recommendations.
+            </p>
+
+            <div className="about-points">
+              <div>Repository-aware intelligence</div>
+              <div>Contextual issue understanding</div>
+              <div>Secure, permission-based GitHub access</div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

@@ -100,21 +100,46 @@ body {
   50% { transform: translateY(-50px) translateX(30px); opacity: 0.8; }
 }
 
-/* GitHub icon glow effect */
-.github-logo {
+/* Company logo background watermark */
+.company-logo-bg {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 800px;
-  height: 800px;
+  width: 600px;
+  height: 600px;
   opacity: 0.03;
   z-index: 1;
+  animation: pulse-bg 4s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.company-logo-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: blur(2px);
+}
+
+@keyframes pulse-bg {
+  0%, 100% { 
+    transform: translate(-50%, -50%) scale(1); 
+    opacity: 0.03; 
+  }
+  50% { 
+    transform: translate(-50%, -50%) scale(1.05); 
+    opacity: 0.05; 
+  }
 }
 
 /* Main content card */
 .content-card {
   position: relative;
+  max-height: none;
+  overflow: visible;
   z-index: 10;
   max-width: 480px;
   width: 90%;
@@ -156,10 +181,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #388bfd 0%, #6b4ce6 100%);
+  background: rgba(22, 27, 34, 0.5);
   border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(56, 139, 253, 0.3);
+  box-shadow: 0 8px 24px rgba(233, 30, 99, 0.3);
   animation: pulse 2s ease-in-out infinite;
+  padding: 6px;
 }
 
 @keyframes pulse {
@@ -167,10 +193,10 @@ body {
   50% { transform: scale(1.05); }
 }
 
-.logo-icon svg {
-  width: 28px;
-  height: 28px;
-  fill: white;
+.logo-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .title {
@@ -190,46 +216,6 @@ body {
   margin-bottom: 12px;
   line-height: 1.6;
   font-weight: 400;
-}
-
-/* Features list */
-.features {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 32px;
-}
-
-.feature-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.9rem;
-  color: #c9d1d9;
-  opacity: 0;
-  animation: slideIn 0.5s ease-out forwards;
-}
-
-.feature-item:nth-child(1) { animation-delay: 0.2s; }
-.feature-item:nth-child(2) { animation-delay: 0.4s; }
-.feature-item:nth-child(3) { animation-delay: 0.6s; }
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.feature-icon {
-  width: 18px;
-  height: 18px;
-  color: #388bfd;
-  flex-shrink: 0;
 }
 
 /* GitHub button */
@@ -306,8 +292,264 @@ body {
     height: 40px;
   }
 
-  .logo-icon svg {
-    width: 24px;
-    height: 24px;
+  .company-logo-bg {
+    width: 400px;
+    height: 400px;
   }
 }
+
+/* Interactive canvas */
+.interactive-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+
+/* Center logo */
+.logo-center {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.logo-center img {
+  width: 140px;
+  filter: drop-shadow(0 0 25px rgba(233,30,99,0.4));
+  animation: floatLogo 4s ease-in-out infinite;
+}
+
+@keyframes floatLogo {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* 3D card */
+.tilt-card {
+  transition: transform 0.2s ease-out;
+  transform-style: preserve-3d;
+}
+
+/* Logo tilt */
+.tilt-logo {
+  transition: transform 0.15s ease-out;
+}
+
+.tilt-logo:hover {
+  transform: translateZ(20px) scale(1.03);
+}
+
+/* About section */
+.about-octor {
+  font-size: 0.9rem;
+  color: #9da7b3;
+  margin-bottom: 20px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* Value strip */
+.value-strip {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.8rem;
+  color: #8b949e;
+  margin-bottom: 22px;
+}
+
+.value-strip span {
+  background: rgba(56, 139, 253, 0.08);
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+.what-is-btn {
+  margin-top: 14px;
+  background: none;
+  border: none;
+  color: #8b949e;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: color 0.2s ease;
+}
+
+.what-is-btn:hover {
+  color: #c9d1d9;
+}
+
+.about-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 20;
+}
+
+.about-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 380px;
+  background: rgba(13,17,23,0.95);
+  backdrop-filter: blur(18px);
+  border-left: 1px solid rgba(56,139,253,0.25);
+  padding: 32px;
+  z-index: 30;
+  animation: slideIn 0.35s ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.close-about {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: #8b949e;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.about-panel h2 {
+  margin-bottom: 12px;
+  font-size: 1.4rem;
+}
+
+.about-panel p {
+  font-size: 0.9rem;
+  color: #9da7b3;
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+
+.about-points {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.about-points div {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(56,139,253,0.08);
+  font-size: 0.85rem;
+  color: #c9d1d9;
+}
+
+/* Centered What is Octor button */
+.what-is-center {
+  display: block;
+  margin: 16px auto 0;
+  font-size: 0.9rem;
+}
+
+/* Overlay */
+.about-popover-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 15;
+}
+
+/* Popover card */
+.about-popover {
+  position: absolute;
+  right: 8%;
+  top: 50%;
+  transform: translateY(-50%) scale(0.96);
+  width: 360px;
+  background: rgba(22, 27, 34, 0.95);
+  border: 1px solid rgba(56, 139, 253, 0.25);
+  border-radius: 14px;
+  padding: 24px;
+  z-index: 20;
+  animation: popIn 0.25s ease-out forwards;
+  backdrop-filter: blur(16px);
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+}
+
+.about-popover h3 {
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+}
+
+.about-popover p {
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: #9da7b3;
+  margin-bottom: 12px;
+}
+
+/* How it works section */
+.how-it-works {
+  margin: 8px 0 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.step {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+
+.step-index {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #388bfd;
+  opacity: 0.9;
+  min-width: 24px;
+}
+
+.step h4 {
+  font-size: 0.9rem;
+  margin-bottom: 1px;
+}
+
+.step p {
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+
+.subtitle {
+  margin-bottom: 10px;
+}
+
+.features {
+  margin-bottom: 6px;
+}
+
+.value-strip {
+  margin-bottom: 16px;
+}
+
+.footer-text {
+  margin-top: 14px;
+}
+
+.action-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
