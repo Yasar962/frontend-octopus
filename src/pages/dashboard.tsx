@@ -5,6 +5,8 @@ import { authFetch } from "../api";
 import "../components/dashboard.css";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import octorLogoHorizontal from "../assets/Octor logo horizontal.svg";
+
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 
@@ -287,7 +289,14 @@ const Dashboard = () => {
     <div className="dashboard-container">
       {/* TOP BAR */}
       <div className="top-bar">
-        <div className="logo">OCTOPUS</div>
+        <div className="logo-container">
+          <img
+            src={octorLogoHorizontal}
+            alt="Octor"
+            className="logo-image"
+          />
+        </div>
+
 
         <div className="avatar-wrapper" ref={menuRef}>
           <img
@@ -306,9 +315,17 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <button onClick={() => alert("Profile page coming soon")}>
+              <button
+                onClick={() => {
+                  const username = (user as any)?.login;
+                  if (username) {
+                    window.open(`https://github.com/${username}`, "_blank");
+                  }
+                }}
+              >
                 Profile
               </button>
+
 
               <button onClick={switchAccount}>Switch Account</button>
 
@@ -407,7 +424,12 @@ const Dashboard = () => {
         {/* MIDDLE PANEL */}
         <div className="glass-card middle-panel">
           <div className="middle-panel-content">
-            {!selectedRepo && <p>Select a repository</p>}
+            {!selectedRepo && (
+              <p style={{ opacity: 0.7 }}>
+                Select a repository to view issues and insights
+              </p>
+            )}
+
 
             {selectedRepo && !selectedIssue && (
               <>
