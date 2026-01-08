@@ -1210,3 +1210,111 @@ html, body {
   font-size: 0.8rem;
   color: #8b949e;
 }
+
+/* ================= HELP & GUIDE ================= */
+
+.help-btn {
+  background: rgba(56, 139, 253, 0.12);
+  border: 1px solid rgba(56, 139, 253, 0.35);
+  color: #c9d1d9;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-family: 'Inter', sans-serif;
+}
+
+.help-btn:hover {
+  background: rgba(56, 139, 253, 0.25);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* Overlay */
+.guide-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 7, 12, 0.6);
+  backdrop-filter: blur(6px);
+  z-index: 200;
+}
+
+/* Popover */
+.guide-popover {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.96);
+  width: 420px;
+  background: rgba(22, 27, 34, 0.95);
+  border: 1px solid rgba(56, 139, 253, 0.35);
+  border-radius: 16px;
+  padding: 26px;
+  z-index: 210;
+  animation: popIn 0.25s ease-out forwards;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
+}
+
+.guide-popover h3 {
+  font-size: 1.25rem;
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+.guide-popover p {
+  font-size: 0.9rem;
+  color: #9da7b3;
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+
+.guide-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 18px 0;
+}
+
+.guide-steps div {
+  background: rgba(56, 139, 253, 0.08);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.guide-steps strong {
+  font-size: 0.9rem;
+  color: #fff;
+}
+
+.guide-steps span {
+  font-size: 0.82rem;
+  color: #8b949e;
+}
+
+.guide-hint {
+  font-size: 0.8rem;
+  color: #8b949e;
+  margin-top: 10px;
+}
+
+.guide-close-btn {
+  margin-top: 18px;
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #388bfd, #6b4ce6);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.guide-close-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(56, 139, 253, 0.5);
+}

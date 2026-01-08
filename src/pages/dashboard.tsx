@@ -83,6 +83,8 @@ const Dashboard = () => {
   const [repoUrl, setRepoUrl] = useState("");
   const [repositories, setRepositories] = useState<Repo[]>([]);
   const [selectedRepo, setSelectedRepo] = useState<Repo | null>(null);
+  const [showGuide, setShowGuide] = useState(false);
+
 
   const [issues, setIssues] = useState<Issue[]>([]);
   const [difficultyFilter, setDifficultyFilter] = useState<string | null>(null);
@@ -304,6 +306,12 @@ const Dashboard = () => {
           />
         </div>
 
+        <button
+          className="help-btn"
+          onClick={() => setShowGuide(true)}
+        >
+          Help & Guide
+        </button>
 
 
         <div className="avatar-wrapper" ref={menuRef}>
@@ -350,6 +358,58 @@ const Dashboard = () => {
             </div>
           )}
         </div>
+        {showGuide && (
+          <>
+            <div
+              className="guide-overlay"
+              onClick={() => setShowGuide(false)}
+            />
+
+            <div className="guide-popover">
+              <h3>Welcome to Octor 👋</h3>
+
+              <p>
+                Octor helps you analyze GitHub repositories, understand issues,
+                and get AI-powered solution guidance.
+              </p>
+
+              <div className="guide-steps">
+                <div>
+                  <strong>1. Connect a repository</strong>
+                  <span>
+                    Paste a GitHub repo URL or select one from your account.
+                  </span>
+                </div>
+
+                <div>
+                  <strong>2. Analyze issues</strong>
+                  <span>
+                    Octor classifies issues by difficulty and context.
+                  </span>
+                </div>
+
+                <div>
+                  <strong>3. Get AI solutions</strong>
+                  <span>
+                    Click any issue to receive step-by-step fix guidance.
+                  </span>
+                </div>
+              </div>
+
+              <p className="guide-hint">
+                💡 Tip: Repositories with issues disabled won’t show results.
+              </p>
+
+              <button
+                className="guide-close-btn"
+                onClick={() => setShowGuide(false)}
+              >
+                Got it
+              </button>
+            </div>
+          </>
+        )}
+
       </div>
 
       <div
